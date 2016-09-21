@@ -158,19 +158,34 @@ public class WeatherChartView extends View {
      */
     private Paint mTextPaint;
 
+    /**
+     * 路径（线）长度
+     */
     private float length;
 
+    /**
+     * 白天的路径长度
+     */
     private Path dayPath = new Path();
 
+    /**
+     * 夜晚路径长度
+     */
     private Path nightPath = new Path();
 
-    Path path = new Path();
+    private Path path = new Path();
 
-    private boolean check = true;
+    /**
+     * 确保执行绘制仅一次
+     */
+    private boolean done = true;
 
+    /**
+     * 判断折线是否绘制完成
+     */
     private boolean isFinished = false;
 
-    PathMeasure measure;
+    private PathMeasure mMeasure;
 
 
     public WeatherChartView(Context context, AttributeSet attrs) {
@@ -223,8 +238,8 @@ public class WeatherChartView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Log.e("Weather", "onDraw");
-        if (check) {
-            check = false;
+        if (done) {
+            done = false;
             if (mHeight == 0) {
                 // 设置控件高度，x轴集合
                 setHeightAndXAxis();
@@ -240,24 +255,27 @@ public class WeatherChartView extends View {
         mLinePaint.setColor(mColorNight);
         canvas.drawPath(nightPath, mLinePaint);
 
-        if (isFinished)
+        if (true)
             drawPoint(canvas);
 
     }
 
     public void startDraw(){
-        check = true;
+        done = true;
         isFinished = false;
         dayPath.reset();
         nightPath.reset();
         invalidate();
     }
 
+    /**
+     * 绘制折线
+     */
     public void drawLine() {
 
         int alpha1 = 102;
         int alpha2 = 255;
-        measure = new PathMeasure(dayPath, false);
+        mMeasure = new PathMeasure(dayPath, false);
         //length = measure.getLength();
         for (int i = 0; i < LENGTH; i++) {
 
@@ -272,7 +290,7 @@ public class WeatherChartView extends View {
                     nightPath.moveTo(mXAxis[i], mYAxisNight[i]);
                     nightPath.lineTo(mXAxis[i + 1], mYAxisNight[i + 1]);
 
-                    measure.setPath(dayPath, false);
+                    mMeasure.setPath(dayPath, false);
 
                 } else {
                     mLinePaint.setAlpha(alpha2);
@@ -283,8 +301,8 @@ public class WeatherChartView extends View {
 
         }
 
-        measure.setPath(dayPath, false);
-        length = measure.getLength();
+        mMeasure.setPath(dayPath, false);
+        length = mMeasure.getLength();
 
         ObjectAnimator animator = ObjectAnimator.ofFloat(this, "phase", 0.0f, 1.0f);
         animator.setDuration(2500);
@@ -292,6 +310,10 @@ public class WeatherChartView extends View {
         // invalidate();
     }
 
+    /**
+     * 绘制点和温度
+     * @param canvas
+     */
     private void drawPoint(Canvas canvas){
         int alpha1 = 102;
         int alpha2 = 255;
@@ -405,111 +427,6 @@ public class WeatherChartView extends View {
         }
     }
 
-    /**
-     * 画折线图
-     *
-     * @param color 画图颜色
-     * @param temp  温度集合
-     * @param yAxis y轴集合
-     * @param type  折线种类：0，白天；1，夜间
-     */
-    private void drawChart(Canvas canvas, int color, int temp[], float[] yAxis, int type) {
-        mLinePaint.setColor(color);
-        mPointPaint.setColor(color);
-
-        Path mPath = new Path();
-
-        int alpha1 = 102;
-        int alpha2 = 255;
-        for (int i = 0; i < LENGTH; i++) {
-            // 画线
-            if (i < LENGTH - 1) {
-                // 昨天
-                if (i == 0) {
-                    mLinePaint.setAlpha(alpha1);
-                    // 设置虚线效果
-                    //mLinePaint.setPathEffect(new DashPathEffect(new float[]{2 * mDensity, 3 * mDensity}, 0));
-                    // 路径
-                    //Path mpath = new Path();
-                    // 路径起点
-                    //mPath.moveTo(mXAxis[i], yAxis[i]);
-                    // 路径连接到
-                    //mPath.lineTo(mXAxis[i+1], yAxis[i +1]);
-                    //canvas.drawPath(mpath, mLinePaint);
-                    canvas.drawLine(mXAxis[i], yAxis[i], mXAxis[i + 1], yAxis[i + 1], mLinePaint);
-                } else {
-                    mLinePaint.setAlpha(alpha2);
-                    // mLinePaint.setPathEffect(null);
-                    //mPath.moveTo(mXAxis[i], yAxis[i]);
-                    //mPath.lineTo(mXAxis[i +1], yAxis[i+1 ]);
-                    //canvas.drawLine(mXAxis[i], yAxis[i], mXAxis[i + 1], yAxis[i + 1], mLinePaint);
-                    canvas.drawLine(mXAxis[i], yAxis[i], mXAxis[i + 1], yAxis[i + 1], mLinePaint);
-                }
-            }
-
-            // 画点
-            if (i != 1) {
-                // 昨天
-                if (i == 0) {
-                    mPointPaint.setAlpha(alpha1);
-                    canvas.drawCircle(mXAxis[i], yAxis[i], mRadius, mPointPaint);
-                } else {
-                    mPointPaint.setAlpha(alpha2);
-                    canvas.drawCircle(mXAxis[i], yAxis[i], mRadius, mPointPaint);
-                }
-                // 今天
-            } else {
-                mPointPaint.setAlpha(alpha2);
-                canvas.drawCircle(mXAxis[i], yAxis[i], mRadiusToday, mPointPaint);
-            }
-
-            // 画字
-            // 昨天
-            if (i == 0) {
-                mTextPaint.setAlpha(alpha1);
-                drawText(canvas, mTextPaint, i, temp, yAxis, type);
-            } else {
-                mTextPaint.setAlpha(alpha2);
-                drawText(canvas, mTextPaint, i, temp, yAxis, type);
-            }
-        }
-
-      /*  if (type == 0)
-            path.addPath(mPath);
-        else*/
-     /*   PathMeasure measure = new PathMeasure(mPath, false);
-        length = measure.getLength();
-        mPath.close();
-        Log.e("Weather", "mPathlength:" + length);
-            path.addPath(mPath, mXAxis[0], yAxis[0]);*/
-
-        //path = mPath;
-
-
-    }
-
-    /**
-     * 绘制文字
-     *
-     * @param canvas    画布
-     * @param textPaint 画笔
-     * @param i         索引
-     * @param temp      温度集合
-     * @param yAxis     y轴集合
-     * @param type      折线种类：0，白天；1，夜间
-     */
-    private void drawText(Canvas canvas, Paint textPaint, int i, int[] temp, float[] yAxis, int type) {
-        switch (type) {
-            case 0:
-                // 显示白天气温
-                canvas.drawText(temp[i] + "°", mXAxis[i], yAxis[i] - mRadius - mTextSpace, textPaint);
-                break;
-            case 1:
-                // 显示夜间气温
-                canvas.drawText(temp[i] + "°", mXAxis[i], yAxis[i] + mTextSpace + mTextSize, textPaint);
-                break;
-        }
-    }
 
     /**
      * 设置高度，x轴集合
@@ -534,14 +451,12 @@ public class WeatherChartView extends View {
         if (phase == 1.0f)
             isFinished = true;
 
-        mLinePaint.setPathEffect(createPathEffect(length, phase, 0.0f));
-       /* prePoint[0] = currentPoint[0];
-        prePoint[1] = currentPoint[1];*/
-        //measure.getPosTan(length * phase, currentPoint, null);
+        mLinePaint.setPathEffect(createPathEffect(length, phase));
+
         invalidate();
     }
 
-    private PathEffect createPathEffect(float pathLength, float phase, float offset) {
+    private PathEffect createPathEffect(float pathLength, float phase) {
 
         return new DashPathEffect(new float[]{pathLength, pathLength}, pathLength - phase * pathLength);
     }
