@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#34c8ed</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#23ff23</color>
+    <color name="dayColor">#ff42aa</color>
+    <color name="nightColor">#3d3dff</color>
+
+    <!--TextView-->
+    <color name="onTextViewPressed">#bebcbc</color>
+    <color name="defaultTextColor">#ffffff</color>
+    <color name="onEnabledFalse">#6b6b6b</color>
+
+    <!--divider-->
+    <color name="divider">#616161</color>
+
+
+</resources>
