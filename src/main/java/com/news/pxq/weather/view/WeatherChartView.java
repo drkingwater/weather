@@ -245,7 +245,7 @@ public class WeatherChartView extends View {
                 setHeightAndXAxis();
             }
             computeYAxisValues();
-            //drawPoint(canvas);
+
             drawLine();
 
         }
@@ -260,7 +260,7 @@ public class WeatherChartView extends View {
 
     }
 
-    public void startDraw(){
+    public void startDraw() {
         done = true;
         isFinished = false;
         dayPath.reset();
@@ -273,32 +273,30 @@ public class WeatherChartView extends View {
      */
     public void drawLine() {
 
-        int alpha1 = 102;
-        int alpha2 = 255;
         mMeasure = new PathMeasure(dayPath, false);
         //length = measure.getLength();
-        for (int i = 0; i < LENGTH; i++) {
+        mLinePaint.setAlpha(102);
+        for (int i = 0; i < LENGTH - 1; i++) {
 
             path.reset();
             // 画线
-            if (i < LENGTH - 1) {
-                // 昨天
-                if (i == 0) {
-                    mLinePaint.setAlpha(alpha1);
-                    dayPath.moveTo(mXAxis[i], mYAxisDay[i]);
-                    dayPath.lineTo(mXAxis[i + 1], mYAxisDay[i + 1]);
-                    nightPath.moveTo(mXAxis[i], mYAxisNight[i]);
-                    nightPath.lineTo(mXAxis[i + 1], mYAxisNight[i + 1]);
 
-                    mMeasure.setPath(dayPath, false);
+            // 昨天
+            if (i == 0) {
 
-                } else {
-                    mLinePaint.setAlpha(alpha2);
-                    dayPath.lineTo(mXAxis[i + 1], mYAxisDay[i + 1]);
-                    nightPath.lineTo(mXAxis[i + 1], mYAxisNight[i + 1]);
-                }
+                dayPath.moveTo(mXAxis[i], mYAxisDay[i]);
+                dayPath.lineTo(mXAxis[i + 1], mYAxisDay[i + 1]);
+                nightPath.moveTo(mXAxis[i], mYAxisNight[i]);
+                nightPath.lineTo(mXAxis[i + 1], mYAxisNight[i + 1]);
+
+                mMeasure.setPath(dayPath, false);
+
+            } else {
+
+                dayPath.lineTo(mXAxis[i + 1], mYAxisDay[i + 1]);
+                nightPath.lineTo(mXAxis[i + 1], mYAxisNight[i + 1]);
             }
-
+            
         }
 
         mMeasure.setPath(dayPath, false);
@@ -312,9 +310,10 @@ public class WeatherChartView extends View {
 
     /**
      * 绘制点和温度
+     *
      * @param canvas
      */
-    private void drawPoint(Canvas canvas){
+    private void drawPoint(Canvas canvas) {
         int alpha1 = 102;
         int alpha2 = 255;
 
