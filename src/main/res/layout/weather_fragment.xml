@@ -65,18 +65,18 @@
         android:layout_below="@id/weather_info_layout"
         android:orientation="vertical">
 
-        <GridView
+     <!--   <GridView
             android:id="@+id/date_grid"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:horizontalSpacing="10dp"
             android:columnWidth="10dp"
-            android:numColumns="6" />
+            android:numColumns="6" />-->
 
         <com.news.pxq.weather.view.WeatherChartView
             android:id="@+id/line_char"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="200dp"
             android:layout_centerInParent="true"
             wcv:dayColor="@color/dayColor"
             wcv:nightColor="@color/nightColor"
@@ -86,9 +86,10 @@
         <GridView
             android:id="@+id/weather_pic_grid"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="120dp"
             android:gravity="center"
             android:numColumns="6" />
+
 
     </LinearLayout>
 
