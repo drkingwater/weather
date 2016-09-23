@@ -98,6 +98,12 @@ public class WeatherChartView extends View {
      */
     private int mTempNight[] = new int[6];
 
+    private String mDate[] = new String[] {"", "", "", "", "", ""};
+
+    private String mWeather[] = new String[]{"", "", "", "", "", ""};
+
+    //TODO 画图
+
     /**
      * 控件高
      */
@@ -198,7 +204,7 @@ public class WeatherChartView extends View {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WeatherChartView);
         float densityText = getResources().getDisplayMetrics().scaledDensity;
         mTextSize = a.getDimensionPixelSize(R.styleable.WeatherChartView_textSize,
-                (int) (14 * densityText));
+                (int) (18 * densityText));
         mColorDay = a.getColor(R.styleable.WeatherChartView_dayColor,
                 getResources().getColor(R.color.colorAccent));
         mColorNight = a.getColor(R.styleable.WeatherChartView_nightColor,
@@ -210,7 +216,7 @@ public class WeatherChartView extends View {
         mDensity = getResources().getDisplayMetrics().density;
         mRadius = 3 * mDensity;
         mRadiusToday = 5 * mDensity;
-        mSpace = 3 * mDensity;
+        mSpace = 5 * mDensity;
         mTextSpace = 10 * mDensity;
 
         float stokeWidth = 2 * mDensity;
@@ -237,7 +243,7 @@ public class WeatherChartView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.e("Weather", "onDraw");
+        //Log.e("Weather", "onDraw");
         if (done) {
             done = false;
             if (mHeight == 0) {
@@ -301,6 +307,10 @@ public class WeatherChartView extends View {
 
         mMeasure.setPath(dayPath, false);
         length = mMeasure.getLength();
+        mMeasure.setPath(nightPath, false);
+        float l = mMeasure.getLength();
+        //选择较长的路径,否者折线可能画不完整
+        length = length > l ? length : l;
 
         ObjectAnimator animator = ObjectAnimator.ofFloat(this, "phase", 0.0f, 1.0f);
         animator.setDuration(2500);
@@ -319,7 +329,7 @@ public class WeatherChartView extends View {
 
        /* mPointPaint.setStyle(Paint.Style.STROKE);
         mPointPaint.setStrokeWidth(mDensity);*/
-        for (int i = 0; i < LENGTH; i++) {
+        for (int i = 0; i < mDate.length; i++) {
 
             // 画点
             if (i != 1) {
@@ -351,18 +361,31 @@ public class WeatherChartView extends View {
             // 昨天
             if (i == 0) {
                 mTextPaint.setAlpha(alpha1);
-                //drawText(canvas, mTextPaint, i, temp, yAxis, type);
+                //白天温度
                 mTextPaint.setColor(mColorDay);
                 canvas.drawText(mTempDay[i] + "°", mXAxis[i], mYAxisDay[i] - mRadius - mTextSpace, mTextPaint);
+                //晚上温度
                 mTextPaint.setColor(mColorNight);
                 canvas.drawText(mTempNight[i] + "°", mXAxis[i], mYAxisNight[i] + mTextSpace + mTextSize, mTextPaint);
+                //日期
+                mTextPaint.setColor(Color.DKGRAY);
+
+                canvas.drawText(mDate[i], mXAxis[i], mTextSize, mTextPaint);
+                //天气
+                canvas.drawText(mWeather[i], mXAxis[i], mHeight - mSpace, mTextPaint);
             } else {
                 mTextPaint.setAlpha(alpha2);
-                //drawText(canvas, mTextPaint, i, temp, yAxis, type);
+                //白天温度
                 mTextPaint.setColor(mColorDay);
                 canvas.drawText(mTempDay[i] + "°", mXAxis[i], mYAxisDay[i] - mRadius - mTextSpace, mTextPaint);
+                //晚上温度
                 mTextPaint.setColor(mColorNight);
                 canvas.drawText(mTempNight[i] + "°", mXAxis[i], mYAxisNight[i] + mTextSpace + mTextSize, mTextPaint);
+                //日期
+                mTextPaint.setColor(Color.BLACK);
+                canvas.drawText(mDate[i], mXAxis[i], mTextSize, mTextPaint);
+                //天气
+                canvas.drawText(mWeather[i], mXAxis[i], mHeight -  mSpace , mTextPaint);
             }
 
         }
@@ -407,9 +430,10 @@ public class WeatherChartView extends View {
         // 份数（白天，夜间综合温差）
         float parts = maxTemp - minTemp;
         // y轴一端到控件一端的距离
-        float length = mSpace + mTextSize + mTextSpace + mRadius;
+        float length = 2 * mSpace + 2 * mTextSize + mTextSpace + mRadius;
         // y轴高度
         float yAxisHeight = mHeight - length * 2;
+        
 
         // 当温度都相同时（被除数不能为0）
         if (parts == 0) {
@@ -476,5 +500,13 @@ public class WeatherChartView extends View {
      */
     public void setTempNight(int[] tempNight) {
         mTempNight = tempNight;
+    }
+
+    public void setDate(String[] date){
+        mDate = date;
+    }
+
+    public void setWeather(String[] weather){
+        mWeather = weather;
     }
 }
